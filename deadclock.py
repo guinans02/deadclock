@@ -2,8 +2,10 @@ import datetime
 import os
 import argparse
 import json
-default_filepath = os.path.relpath("./serial/default") 
 
+#constants
+default_filepath = os.path.relpath("./serial/default") 
+default_format   = "%d/%m/%y" #for use with datetime object declaration
 
 ### DEADLINE CLASS DECLARATION
 class Deadline:
@@ -15,26 +17,31 @@ class Deadline:
   #  (Deadlinename, Date)
   @classmethod
   def json_to_obj(cls, json_str):
-    name, date = json.loads(json_str) #Error handling?
+    #datetime.datetime.strptime(input("Deadline date (dd/mm/yy):"), "%d/%m/%y")
+    name, date = datetime.datetime.strptime(json.loads(json_str)) #Error handling?
     return cls(name, date)
 
   def obj_to_json(self):
     return json.dumps(
-                  (self.name, self.date.strftime("%d/%m/%y"))
+                  (self.name, self.date.strftime(default_format))
                     )
 
 def main():
   #argparse declaration (own function?)
   parser = argparse.ArgumentParser()
-  parser.add_argument("-w", help="write a deadline to the deadclock")
+  #write flag, optional
+  parser.add_argument("-w", help="Write a deadline to the deadclock.", action="store_true", required=False)
 
-
-  #default operation-- print stored deadlines
-  cur_time = datetime.datetime.now() #datetime obj
-  #dl_dict  = parse_file()      #dictionary {deadline_name : deltatime}
-
+  if "-w" in vars(parser.parse_args()).keys():
+    write_file()
   
-  write_file()
+  #default operation, print stored deadlines
+  deadline_list = read_file()
+
+  cur_time = datetime.datetime.now() #datetime obj
+  
+  for dl in deadline_list:
+    print(dl.name, cur_time - dl.date)
 
 """
 1. Query the user for a deadline name and date,
@@ -91,6 +98,9 @@ def read_file(filepath = default_filepath):
   
   file.close()
   return deadline_list
+
+def str_to_datetime(in_str, frmt = default_format):
+  return datetime.datetime.strptime(in_str, frmt)
 
 #necessary?
 if __name__ == "__main__":
