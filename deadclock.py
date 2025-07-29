@@ -16,9 +16,10 @@ class Deadline:
   #Recall that the deadline JSON values are stored as:
   #  (Deadlinename, Date)
   @classmethod
-  def json_to_obj(cls, json_str):
+  def json_to_obj(cls, json_str:str, frmt = default_format):
     #datetime.datetime.strptime(input("Deadline date (dd/mm/yy):"), "%d/%m/%y")
-    name, date = datetime.datetime.strptime(json.loads(json_str)) #Error handling?
+    ndt = json.loads(json_str) #name, date tuple
+    name, date = ndt[0], datetime.datetime.strptime(ndt[1], frmt) #Error handling?
     return cls(name, date)
 
   def obj_to_json(self):
@@ -39,9 +40,11 @@ def main():
   deadline_list = read_file()
 
   cur_time = datetime.datetime.now() #datetime obj
-  
+
+  #Separate print function, formatting libs
+  print("Time until:")  
   for dl in deadline_list:
-    print(dl.name, cur_time - dl.date)
+    print(dl.name, dl.date - cur_time)
 
 """
 1. Query the user for a deadline name and date,
