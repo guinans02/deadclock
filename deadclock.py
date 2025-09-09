@@ -44,7 +44,7 @@ def main():
   #Separate print function, formatting libs
   print("Time until:")  
   for dl in deadline_list:
-    print(dl.name, dl.date - cur_time)
+    print(dl.name + ": " + str(dl.date - cur_time))
 
 """
 1. Query the user for a deadline name and date,
